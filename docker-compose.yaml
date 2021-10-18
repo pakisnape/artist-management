@@ -1,21 +1,38 @@
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-13}-alpine
+  db:
+    build:
+      context: ./docker/database
+    container_name: artistmanagement
+    image: mariadb:latest
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
-      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: artistmanagement
+      MYSQL_USER: artist
+      MYSQL_PASSWORD: artist
+    ports:
+      - "4306:3306"
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/data:/var/lib/mysql
+    networks:
+      - symfony
 
-volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+  artistmanagement:
+    build:
+      context: ./docker/apache
+    container_name: artistmanagement_symfony
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/artistmanagement/
+    ports:
+      - 2520:8050
+    restart: always
+    entrypoint: sh /var/www/artistmanagement/docker/apache/start_server.sh
+    networks:
+      - symfony
+
+networks:
+  symfony:
