@@ -26,3 +26,7 @@
 - Manage Users
 - View Logs (Logs are being added whenever any change happens in celebrity, representative)
 - Celebrity > Show > Assign / Deassign Represntative for that specific Celebrity
+
+# Short Documentations with Screenshots
+
+https://drive.google.com/file/d/1XHsYmJKwZFrv4d2hXHW7lhLEIvymQX86/view?usp=sharing
